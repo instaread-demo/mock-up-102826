@@ -1,0 +1,637 @@
+<!DOCTYPE html><html lang="en" class="js"><head><meta charset="utf-8"><meta name="referrer" content="no-referrer"><base href="https://www.allabtai.com/polymarket-winning-ai-trading-strategy/">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My First Winning Agentic AI Trading Strategy On Polymarket — All About AI</title>
+<meta name="description" content="I walk through the first Polymarket agentic AI trading strategy that has been working for me: a maker-side fair value approach on 5-minute BTC markets.">
+<meta name="author" content="Kristian Fagerlie">
+<link rel="canonical" href="https://www.allabtai.com/polymarket-winning-ai-trading-strategy/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="alternate" type="application/rss+xml" title="All About AI RSS" href="/feed.xml">
+<link rel="alternate" type="application/json" title="All About AI JSON Feed" href="/feed.json">
+<link rel="preload" href="/fonts/IBM_VGA_8.ttf" as="font" type="font/ttf" crossorigin="">
+
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="My First Winning Agentic AI Trading Strategy On Polymarket — All About AI">
+<meta property="og:description" content="I walk through the first Polymarket agentic AI trading strategy that has been working for me: a maker-side fair value approach on 5-minute BTC markets.">
+<meta property="og:url" content="https://www.allabtai.com/polymarket-winning-ai-trading-strategy/">
+<meta property="og:site_name" content="All About AI">
+<meta property="og:image" content="https://www.allabtai.com/og/polymarket-winning-ai-trading-strategy.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="My First Winning Agentic AI Trading Strategy On Polymarket — All About AI">
+<meta name="twitter:description" content="I walk through the first Polymarket agentic AI trading strategy that has been working for me: a maker-side fair value approach on 5-minute BTC markets.">
+<meta name="twitter:image" content="https://www.allabtai.com/og/polymarket-winning-ai-trading-strategy.png">
+<meta property="article:published_time" content="2026-06-19">
+<meta property="article:modified_time" content="2026-10-28">
+<meta property="article:author" content="Kristian Fagerlie">
+
+
+
+<style data-ir-css="1">@font-face { font-family: "IBM VGA 8"; src: url("/fonts/IBM_VGA_8.ttf") format("truetype"); font-display: swap; }
+:root { --bg: #0f0f0f; --bg-raise: #131313; --surface: #1a1a1a; --surface-2: #202020; --fg: #f4f4f4; --muted: #cfcfcf; --dim: #909090; --faint: #6a6a6a; --accent: #1c1; --accent-soft: rgba(17, 204, 17, 0.55); --accent-glow: rgba(17, 204, 17, 0.16); --accent-dim: #0a5d0a; --border: #555; --border-soft: #3a3a3a; --border-faint: #2a2a2a; --mono: "IBM VGA 8", ui-monospace, Menlo, Consolas, monospace; --prose: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+           "Helvetica Neue", Arial, sans-serif; --wrap: 1080px; --article: 760px; --header-h: 56px; }
+@view-transition { navigation: auto; }
+* { box-sizing: border-box; }
+html { background: var(--bg); scroll-padding-top: calc(var(--header-h) + 16px); }
+html:focus-within { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 18px; line-height: 1.6; margin: 0px; padding: 0px; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+body::before { content: ""; position: fixed; inset: 0px; z-index: 9999; pointer-events: none; background: repeating-linear-gradient(rgba(255, 255, 255, 0.024) 0px, rgba(255, 255, 255, 0.024) 1px, transparent 1px, transparent 3px); }
+::selection { background: var(--accent); color: rgb(0, 0, 0); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a.skip { position: absolute; left: -9999px; z-index: 500; background: var(--accent); color: rgb(0, 0, 0); padding: 8px 14px; }
+a.skip:focus { left: 12px; top: 12px; }
+header.site { text-align: center; padding: 32px 0px 8px; }
+header.site a { text-decoration: none; }
+header.site h1, header.site .site-title { font-size: 56px; margin: 0px; text-shadow: 5px 5px var(--border); letter-spacing: 1px; color: var(--fg); display: inline-block; font-weight: bold; }
+nav.site { text-align: center; padding: 16px 0px 32px; }
+nav.site a { color: var(--accent); text-decoration: none; margin: 0px 12px; }
+nav.site a:hover { text-decoration: underline; }
+#progress { position: fixed; top: 0px; left: 0px; height: 2px; width: 0px; background: var(--accent); box-shadow: 0 0 8px var(--accent-soft); z-index: 300; }
+header.top { position: sticky; top: 0px; z-index: 200; background: rgba(15, 15, 15, 0.86); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-faint); }
+.top-inner { max-width: var(--wrap); margin: 0px auto; height: var(--header-h); padding: 0px 20px; display: flex; align-items: center; gap: 18px; }
+.brand { display: inline-flex; align-items: baseline; gap: 2px; font-size: 19px; font-weight: bold; color: var(--fg); letter-spacing: 0.5px; white-space: nowrap; text-decoration: none; }
+.brand:hover { text-decoration: none; }
+.brand .prompt { color: var(--accent); margin-right: 7px; }
+.brand .cursor { display: inline-block; width: 9px; height: 17px; margin-left: 6px; background: var(--accent); align-self: center; animation: 1.1s steps(1) 0s infinite normal none running blink; }
+@keyframes blink { 
+  50% { opacity: 0; }
+}
+nav.main { display: flex; align-items: center; gap: 4px; margin-left: auto; font-size: 15px; }
+nav.main a { color: var(--muted); padding: 6px 10px; }
+nav.main a:hover { color: var(--accent); text-decoration: none; }
+nav.main a[aria-current="page"] { color: var(--accent); }
+.nav-yt { color: var(--accent) !important; }
+button.search-btn { font-family: var(--mono); font-size: 14px; color: var(--dim); background: var(--bg-raise); border: 1px solid var(--border-soft); border-radius: 3px; padding: 6px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+button.search-btn:hover { color: var(--fg); border-color: var(--border); }
+button.search-btn kbd { font-family: var(--mono); font-size: 12px; color: var(--faint); border: 1px solid var(--border-faint); border-radius: 2px; padding: 1px 5px; }
+button.font-btn { font-family: var(--prose); font-size: 14px; color: var(--dim); background: none; border: 1px solid var(--border-soft); border-radius: 3px; padding: 5px 9px; cursor: pointer; line-height: 1; }
+button.font-btn:hover { color: var(--fg); border-color: var(--border); }
+.wrap { max-width: var(--wrap); margin: 0px auto; padding: 0px 20px 96px; }
+.wrap-article { max-width: var(--article); margin: 0px auto; padding: 0px 20px 96px; }
+.hero { padding: 72px 0px 40px; text-align: center; position: relative; }
+.hero h1 { font-size: 64px; margin: 0px 0px 8px; letter-spacing: 1px; color: var(--fg); text-shadow: 5px 5px var(--border),
+    0 0 32px var(--accent-glow); line-height: 1.1; }
+.hero .typed-line { font-size: 17px; color: var(--dim); margin: 18px auto 0px; min-height: 1.6em; max-width: 640px; }
+.hero .typed-line .prompt { color: var(--accent); }
+.hero .typed-line .caret { display: inline-block; width: 9px; height: 15px; background: var(--accent); vertical-align: -2px; animation: 1.1s steps(1) 0s infinite normal none running blink; }
+.hero-stats { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px 36px; margin: 34px 0px 0px; padding: 0px; list-style: none; }
+.hero-stats li { color: var(--dim); font-size: 15px; }
+.hero-stats strong { display: block; color: var(--fg); font-size: 26px; text-shadow: 2px 2px var(--border-soft); }
+.hero-stats .unit { color: var(--accent); }
+.hero-note { max-width: 620px; margin: 28px auto 0px; color: var(--dim); font-size: 15px; text-align: center; }
+.hero-note a { color: var(--accent); }
+.hero-cta { margin-top: 34px; display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; }
+.btn { font-family: var(--mono); font-size: 16px; padding: 11px 22px; border-radius: 3px; border: 1px solid var(--border-soft); color: var(--muted); background: var(--bg-raise); text-decoration: none; display: inline-block; transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s; }
+.btn:hover { text-decoration: none; transform: translateY(-1px); border-color: var(--border); color: var(--fg); }
+.btn-accent { border-color: var(--accent-dim); color: var(--accent); background: rgba(17, 204, 17, 0.06); }
+.btn-accent:hover { border-color: var(--accent); box-shadow: 0 0 18px var(--accent-glow); color: var(--accent); }
+.sec-head { display: flex; align-items: baseline; gap: 14px; margin: 64px 0px 22px; }
+.sec-head h2 { font-size: 24px; margin: 0px; text-shadow: 2px 2px var(--border-soft); white-space: nowrap; }
+.sec-head h2 .prompt { color: var(--accent); margin-right: 8px; }
+.sec-head::after { content: ""; flex: 1 1 0%; border-top: 1px solid var(--border-faint); transform: translateY(-4px); }
+.sec-head .sec-count { color: var(--faint); font-size: 14px; white-space: nowrap; }
+.hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0px; margin: 0px; list-style: none; }
+.hub-card { position: relative; display: block; background: var(--bg-raise); border: 1px solid var(--border-soft); border-radius: 4px; padding: 18px 18px 16px; text-decoration: none; transition: transform 0.14s, border-color 0.14s, box-shadow 0.14s; overflow: hidden; }
+.hub-card::before { content: ""; position: absolute; top: 0px; left: 0px; right: 0px; height: 2px; background: linear-gradient(90deg, var(--accent), transparent 70%); opacity: 0; transition: opacity 0.14s; }
+.hub-card:hover { text-decoration: none; transform: translateY(-3px); border-color: var(--accent-dim); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 22px var(--accent-glow); }
+.hub-card:hover::before { opacity: 1; }
+.hub-card .hub-title { display: flex; align-items: baseline; gap: 8px; color: var(--fg); font-weight: bold; font-size: 17px; margin: 0px 0px 8px; }
+.hub-card .hub-title::before { content: "▸"; color: var(--accent); font-size: 14px; }
+.hub-card .hub-blurb { display: block; color: var(--dim); font-size: 14px; line-height: 1.55; margin: 0px; font-family: var(--prose); }
+.hub-card .hub-more { display: block; margin-top: 12px; color: var(--accent); font-size: 13px; }
+.filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0px 0px 26px; }
+.filter-input-wrap { flex: 1 1 280px; display: flex; align-items: center; gap: 10px; background: var(--bg-raise); border: 1px solid var(--border-soft); border-radius: 3px; padding: 10px 14px; }
+.filter-input-wrap .prompt { color: var(--accent); font-size: 15px; }
+#filter-input { flex: 1 1 0%; background: none; border: none; outline: none; color: var(--fg); font-family: var(--mono); font-size: 16px; min-width: 0px; }
+#filter-input::placeholder { color: var(--faint); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--mono); font-size: 13px; color: var(--dim); background: none; border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 13px; cursor: pointer; transition: border-color 0.12s, color 0.12s; }
+.chip:hover { color: var(--fg); border-color: var(--border); }
+.chip[aria-pressed="true"] { color: var(--accent); border-color: var(--accent-dim); background: rgba(17, 204, 17, 0.07); }
+.year-group { margin: 0px 0px 8px; }
+.year-label { position: sticky; top: var(--header-h); z-index: 5; background: linear-gradient(to bottom, var(--bg) 75%, transparent); color: var(--accent); font-size: 15px; letter-spacing: 2px; padding: 14px 0px 8px; margin: 0px; }
+.year-label::before { content: "// "; color: var(--faint); }
+.post-list { list-style: none; padding: 0px; margin: 0px; }
+.post-list li { margin: 0px; }
+.post-list li a { display: flex; align-items: baseline; gap: 16px; padding: 11px 10px; margin: 0px -10px; border-radius: 3px; border-bottom: 1px solid var(--border-faint); color: var(--muted); font-size: 16px; line-height: 1.45; transition: background 0.1s, color 0.1s; }
+.post-list li a:hover { text-decoration: none; background: var(--bg-raise); color: var(--accent); }
+.post-list li a:hover .post-title::before { color: var(--accent); }
+.post-list .post-title { flex: 1 1 0%; }
+.post-list .post-title::before { content: "› "; color: var(--faint); }
+.post-list .date { color: var(--faint); font-size: 13px; white-space: nowrap; }
+#no-results { color: var(--dim); padding: 24px 0px; display: none; }
+#no-results .prompt { color: var(--accent); }
+article h1 { font-size: 38px; line-height: 1.2; text-shadow: 3px 3px var(--border-soft); margin: 48px 0px 14px; }
+article .byline { color: var(--dim); font-size: 14px; margin: 0px 0px 30px; padding-bottom: 18px; border-bottom: 1px solid var(--border-faint); }
+article .byline a { color: var(--dim); border-bottom: 1px dotted var(--dim); }
+article .byline a:hover { color: var(--accent); border-bottom-color: var(--accent); text-decoration: none; }
+article p, article li, article blockquote { font-family: var(--prose); font-size: 17px; line-height: 1.75; letter-spacing: 0.01em; }
+article p { color: var(--muted); margin: 0px 0px 18px; }
+body.font-mono article p, body.font-mono article li, body.font-mono article blockquote { font-family: var(--mono); font-size: 17px; line-height: 1.7; letter-spacing: 0px; }
+article h2 { font-size: 27px; line-height: 1.3; text-shadow: 2px 2px var(--border-soft); margin: 44px 0px 14px; scroll-margin-top: calc(var(--header-h) + 20px); }
+article h3 { font-size: 20px; margin: 32px 0px 10px; scroll-margin-top: calc(var(--header-h) + 20px); }
+article h2 a.anchor, article h3 a.anchor { color: var(--border); margin-left: 10px; font-size: 0.75em; opacity: 0; text-decoration: none; }
+article h2:hover a.anchor, article h3:hover a.anchor { opacity: 1; color: var(--accent); }
+article ul, article ol { color: var(--muted); padding-left: 26px; margin: 0px 0px 18px; }
+article li { margin: 6px 0px; }
+article li::marker { color: var(--accent); }
+article strong { color: var(--fg); }
+article img { max-width: 100%; height: auto; border: 1px solid var(--border-faint); border-radius: 4px; }
+article iframe[src*="youtube"] { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 1px solid var(--border-soft); border-radius: 4px; margin: 24px 0px; background: rgb(0, 0, 0); }
+code { font-family: var(--mono); background: var(--surface); border: 1px solid var(--border-faint); padding: 2px 6px; border-radius: 3px; font-size: 0.92em; color: var(--fg); }
+pre { background: var(--bg-raise); padding: 18px; overflow-x: auto; border: 1px solid var(--border-soft); border-radius: 4px; margin: 0px 0px 18px; position: relative; }
+pre code { background: transparent; border: none; padding: 0px; color: var(--muted); }
+blockquote { border-left: 3px solid var(--accent); margin: 18px 0px; padding: 6px 20px; color: var(--muted); background: rgba(17, 204, 17, 0.03); }
+hr { border-right: 0px; border-bottom: 0px; border-left: 0px; border-image: initial; border-top: 1px solid var(--border-soft); margin: 36px 0px; }
+table { border-collapse: collapse; width: 100%; margin: 0px 0px 18px; font-family: var(--prose); font-size: 15px; }
+th, td { border: 1px solid var(--border-soft); padding: 8px 12px; text-align: left; color: var(--muted); }
+th { color: var(--fg); background: var(--bg-raise); }
+nav.toc { background: var(--bg-raise); border: 1px solid var(--border-soft); border-radius: 4px; padding: 14px 18px; margin: 0px 0px 28px; font-size: 14px; }
+nav.toc summary { cursor: pointer; color: var(--accent); letter-spacing: 1px; font-size: 13px; user-select: none; }
+nav.toc ol { list-style: none; margin: 12px 0px 2px; padding: 0px; font-family: var(--mono); }
+nav.toc li { margin: 7px 0px; }
+nav.toc a { color: var(--dim); }
+nav.toc a::before { content: "› "; color: var(--faint); }
+nav.toc a:hover { color: var(--accent); text-decoration: none; }
+nav.toc a.active { color: var(--accent); }
+aside.tldr { background: var(--bg-raise); border-top-color: ; border-top-style: ; border-top-width: ; border-right-color: ; border-right-style: ; border-right-width: ; border-bottom-color: ; border-bottom-style: ; border-bottom-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; border-left: 3px solid var(--accent); border-radius: 0px 4px 4px 0px; padding: 16px 20px; margin: 24px 0px 32px; }
+aside.tldr strong { display: block; color: var(--accent); margin-bottom: 10px; font-size: 13px; letter-spacing: 2px; font-family: var(--mono); }
+aside.tldr ul { margin: 0px; padding-left: 20px; }
+aside.tldr li { color: var(--muted); margin: 6px 0px; font-size: 15px; font-family: var(--prose); line-height: 1.6; }
+aside.disclaimer { background: rgba(204, 136, 17, 0.08); border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgba(204, 136, 17, 0.38) rgba(204, 136, 17, 0.38) rgba(204, 136, 17, 0.38) rgb(204, 136, 17); border-image: initial; border-radius: 0px 4px 4px 0px; color: var(--muted); font-family: var(--prose); font-size: 15px; line-height: 1.65; margin: 24px 0px; padding: 14px 18px; }
+aside.disclaimer strong { color: rgb(240, 179, 90); }
+section.faq { margin: 56px 0px 0px; }
+section.faq h2 { font-size: 24px; text-shadow: 2px 2px var(--border-soft); margin: 0px 0px 16px; }
+section.faq details { background: var(--bg-raise); border: 1px solid var(--border-soft); border-radius: 4px; padding: 13px 18px; margin: 10px 0px; transition: border-color 0.12s; }
+section.faq details:hover { border-color: var(--border); }
+section.faq summary { cursor: pointer; color: var(--fg); font-weight: bold; font-size: 15px; font-family: var(--prose); }
+section.faq summary::marker { color: var(--accent); }
+section.faq summary:hover { color: var(--accent); }
+section.faq details[open] { border-color: var(--accent-dim); }
+section.faq details[open] summary { margin-bottom: 10px; color: var(--accent); }
+section.faq details p { color: var(--muted); margin: 0px 0px 8px; font-size: 15px; line-height: 1.65; }
+aside.pillar-link { margin: 36px 0px; padding: 14px 18px; border-top-color: ; border-top-style: ; border-top-width: ; border-right-color: ; border-right-style: ; border-right-width: ; border-bottom-color: ; border-bottom-style: ; border-bottom-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; border-left: 3px solid var(--accent); border-radius: 0px 4px 4px 0px; background: var(--bg-raise); font-size: 14px; color: var(--dim); font-family: var(--prose); }
+aside.pillar-link a { color: var(--accent); }
+.related-posts { margin: 48px 0px 0px; padding: 26px 0px 0px; border-top: 1px solid var(--border-soft); }
+.related-posts h2 { font-size: 20px; margin: 0px 0px 14px; text-shadow: 2px 2px var(--border-soft); }
+.related-posts h2::before { content: "$ "; color: var(--accent); }
+.related-posts ul { list-style: none; padding: 0px; margin: 0px; }
+.related-posts li { margin: 9px 0px; padding-left: 18px; position: relative; }
+.related-posts li::before { content: "›"; position: absolute; left: 0px; color: var(--accent); }
+.related-posts a { color: var(--muted); font-size: 15px; }
+.related-posts a:hover { color: var(--accent); text-decoration: none; }
+.author-box { display: flex; gap: 20px; align-items: flex-start; background: var(--bg-raise); border: 1px solid var(--border-soft); border-radius: 4px; padding: 22px; margin: 48px 0px 0px; }
+.author-box .author-avatar { width: 76px; height: 76px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--border-soft); }
+.author-box .author-info { flex: 1 1 0%; }
+.author-box .author-name { margin: 0px 0px 8px; color: var(--fg); }
+.author-box .author-bio { color: var(--muted); margin: 0px 0px 12px; font-size: 14px; line-height: 1.6; font-family: var(--prose); }
+.author-box .author-links { color: var(--dim); font-size: 14px; margin: 0px; }
+.author-box .author-links a { color: var(--accent); }
+#palette { position: fixed; inset: 0px; z-index: 400; display: none; background: rgba(0, 0, 0, 0.62); backdrop-filter: blur(3px); }
+#palette.open { display: block; }
+.palette-box { max-width: 620px; margin: 11vh auto 0px; background: var(--bg-raise); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7), 0 0 40px var(--accent-glow); overflow: hidden; }
+.palette-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border-faint); }
+.palette-head .prompt { color: var(--accent); font-size: 16px; }
+#palette-input { flex: 1 1 0%; background: none; border: none; outline: none; color: var(--fg); font-family: var(--mono); font-size: 17px; min-width: 0px; }
+#palette-input::placeholder { color: var(--faint); }
+.palette-head kbd { font-family: var(--mono); font-size: 11px; color: var(--faint); border: 1px solid var(--border-faint); border-radius: 2px; padding: 2px 6px; }
+#palette-results { list-style: none; margin: 0px; padding: 8px; max-height: 52vh; overflow-y: auto; }
+#palette-results li a { display: flex; align-items: baseline; gap: 12px; padding: 10px 12px; border-radius: 4px; color: var(--muted); font-size: 15px; line-height: 1.4; }
+#palette-results li a .date { color: var(--faint); font-size: 12px; margin-left: auto; white-space: nowrap; }
+#palette-results li a::before { content: "›"; color: var(--faint); }
+#palette-results li a:hover, #palette-results li.sel a { background: var(--surface-2); color: var(--accent); text-decoration: none; }
+#palette-results li.sel a::before { color: var(--accent); }
+#palette-results .palette-empty { color: var(--faint); padding: 18px 12px; font-size: 14px; }
+footer.site { margin-top: 96px; border-top: 1px solid var(--border-faint); background: var(--bg-raise); }
+.footer-inner { max-width: var(--wrap); margin: 0px auto; padding: 44px 20px 28px; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 28px; margin-bottom: 36px; }
+.footer-grid h3 { font-size: 13px; letter-spacing: 2px; color: var(--accent); margin: 0px 0px 12px; }
+.footer-grid ul { list-style: none; margin: 0px; padding: 0px; }
+.footer-grid li { margin: 8px 0px; }
+.footer-grid a { color: var(--dim); font-size: 14px; }
+.footer-grid a:hover { color: var(--accent); text-decoration: none; }
+.footer-about { color: var(--dim); font-size: 14px; line-height: 1.6; font-family: var(--prose); margin: 10px 0px 0px; max-width: 340px; }
+.footer-brand { font-size: 18px; color: var(--fg); font-weight: bold; }
+.footer-brand .prompt { color: var(--accent); margin-right: 6px; }
+.footer-bottom { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; color: var(--faint); font-size: 13px; border-top: 1px solid var(--border-faint); padding-top: 20px; }
+.footer-bottom .status-ok { color: var(--accent); }
+#to-top { position: fixed; right: 22px; bottom: 22px; z-index: 150; font-family: var(--mono); font-size: 14px; color: var(--dim); background: var(--bg-raise); border: 1px solid var(--border-soft); border-radius: 3px; padding: 9px 12px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.15s, color 0.12s, border-color 0.12s; }
+#to-top.show { opacity: 1; pointer-events: auto; }
+#to-top:hover { color: var(--accent); border-color: var(--accent-dim); }
+.reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.4s, transform 0.4s; }
+.reveal.in { opacity: 1; transform: none; }
+html:not(.js) .reveal { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto; }
+  *, ::before, ::after { animation-duration: 0.001s !important; transition-duration: 0.001s !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+@media (max-width: 900px) {
+  .hub-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .hero h1 { font-size: 48px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; }
+  .top-inner { gap: 10px; padding: 0px 14px; }
+  .brand { font-size: 16px; }
+  .brand .label-full { display: none; }
+  nav.main { gap: 0px; font-size: 14px; }
+  nav.main a { padding: 6px 7px; }
+  nav.main a.nav-hide-m { display: none; }
+  button.search-btn .search-label, button.search-btn kbd { display: none; }
+  button.search-btn { padding: 6px 10px; }
+  .hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0px, 1fr)); gap: 18px 12px; max-width: 360px; margin-left: auto; margin-right: auto; }
+  .hero { padding: 48px 0px 28px; }
+  .hero h1 { font-size: 34px; text-shadow: 3px 3px var(--border), 0 0 24px var(--accent-glow); }
+  .hero .typed-line { font-size: 14px; }
+  .hero-stats { gap: 8px 22px; }
+  .hero-stats strong { font-size: 21px; }
+  .hero-cta .btn { font-size: 14px; padding: 10px 16px; }
+  .sec-head { margin: 44px 0px 18px; }
+  .sec-head h2 { font-size: 19px; }
+  .hub-grid { grid-template-columns: 1fr; }
+  .post-list li a { flex-direction: column; gap: 3px; padding: 12px 10px; }
+  .post-list .date { font-size: 12px; }
+  article h1 { font-size: 27px; margin-top: 32px; }
+  article h2 { font-size: 21px; }
+  article h3 { font-size: 18px; }
+  article p, article li, article blockquote { font-size: 16px; }
+  .author-box { flex-direction: column; align-items: flex-start; }
+  .footer-grid { grid-template-columns: 1fr; gap: 22px; }
+  .palette-box { margin: 6vh 14px 0px; }
+  #to-top { right: 14px; bottom: 14px; }
+}
+</style><style data-ir-guard="1">html, body { overflow-y: auto !important; height: auto !important; }</style></head>
+<body class="">
+<div id="progress" aria-hidden="true" style="width: 0%;"></div>
+<a class="skip" href="#main">skip to content</a>
+<header class="top">
+<div class="top-inner">
+<a class="brand" href="/" rel="home"><span class="prompt">$</span><span class="label-full">all_about_ai</span><span class="cursor" aria-hidden="true"></span></a>
+<nav class="main" aria-label="Main">
+<a href="/" class="nav-hide-m">Home</a><a href="/#topics" class="nav-hide-m">Topics</a><a href="/about/">About</a><a href="https://www.youtube.com/@AllAboutAI" class="nav-yt" target="_blank" rel="noopener">YouTube ↗</a><a href="https://www.siktintelligence.com/" class="nav-hide-m" rel="noopener">Sikt ↗</a>
+<button type="button" class="search-btn" aria-label="Search articles"><span aria-hidden="true">/</span><span class="search-label">search</span><kbd>⌘K</kbd></button>
+<button type="button" class="font-btn" aria-label="Toggle article font" aria-pressed="false" title="Article font: readable — click for terminal">Aa</button>
+</nav>
+</div>
+</header>
+<main id="main" class="wrap-article">
+<article>
+<h1>My First Winning Agentic AI Trading Strategy On Polymarket</h1>
+<p class="byline">By <a href="/about/" rel="author">Kristian Fagerlie</a> · <time datetime="2026-06-19">2026-06-19</time> · 5 min read</p>
+<aside class="tldr"><strong>TL;DR</strong><ul><li>This is the first Polymarket strategy I have had real success with while letting the system run autonomously in the background.</li><li>Most people think about Polymarket as a taker venue: you see a price, you click buy, and you take whatever is available in the order book.</li><li>The whole strategy depends on calculating a fair value price for the current 5-minute BTC market.</li></ul></aside>
+<nav class="toc" aria-label="Table of contents"><details open=""><summary>CONTENTS</summary>
+<ol>
+<li><a href="#the-problem-with-being-a-taker">The problem with being a taker</a></li>
+<li><a href="#the-core-idea-fair-value-minus-a-discount">The core idea: fair value minus a discount</a></li>
+<li><a href="#why-ai-helps-here">Why AI helps here</a></li>
+<li><a href="#the-current-results">The current results</a></li>
+<li><a href="#maker-side-trading-is-not-the-rebate-game">Maker-side trading is not the rebate game</a></li>
+<li><a href="#the-biggest-risk-overfitting-the-fair-value-model">The biggest risk: overfitting the fair value model</a></li>
+<li><a href="#why-this-is-a-good-agentic-strategy">Why this is a good agentic strategy</a></li>
+<li><a href="#resources">Resources</a></li>
+</ol></details></nav>
+<div id="instaread-demo-player-wrap" style="max-width: 720px !important;">
+<style>
+  #instaread-demo-player-wrap { margin:28px auto 30px !important; width:100% !important;
+    min-width:min(320px, 92vw) !important; max-width:100% !important;
+    clear:both !important; float:none !important; position:static !important;
+    display:block !important; flex:1 1 100%; }
+  #instaread-demo-player-wrap .instaread-player { display:block !important;
+    visibility:visible !important; opacity:1 !important;
+    background:#1e1f24 !important; border:1px solid #3a3b42;
+    border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,.5); padding:18px 20px 12px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    text-align:left; color:#f0f0f2; line-height:1.4; box-sizing:border-box; }
+  #instaread-demo-player-wrap * { box-sizing:border-box; margin:0; padding:0; }
+  #instaread-demo-player-wrap .irp-top { display:flex !important; justify-content:space-between;
+    align-items:baseline; gap:16px; margin:0 0 10px !important; }
+  #instaread-demo-player-wrap .irp-label { font-size:15px !important; font-weight:700; color:#f0f0f2 !important; }
+  #instaread-demo-player-wrap .irp-sponsor-tag { font-size:11.5px; color:#8d8f98; white-space:nowrap; }
+  #instaread-demo-player-wrap .irp-mid { display:flex !important; align-items:center !important; gap:14px !important; }
+  #instaread-demo-player-wrap .irp-btn { flex:0 0 46px !important;
+    width:46px !important; height:46px !important; min-width:46px !important;
+    max-width:46px !important; min-height:46px !important; max-height:46px !important;
+    padding:0 !important; border-radius:50% !important; border:none !important;
+    background:#11cc11 !important; cursor:pointer; display:flex !important;
+    align-items:center; justify-content:center; transition:transform .12s ease; }
+  #instaread-demo-player-wrap .irp-btn:hover { transform:scale(1.06); }
+  #instaread-demo-player-wrap .irp-btn svg { width:18px !important; height:18px !important;
+    fill:#fff !important; display:block; margin:0 !important; opacity:1 !important;
+    max-width:none !important; min-width:0 !important; }
+  #instaread-demo-player-wrap .irp-btn svg[data-irp-hidden] { display:none !important; }
+  #instaread-demo-player-wrap .irp-wave { flex:1 1 auto !important; height:44px !important;
+    display:flex !important; align-items:center !important; gap:1.5px !important; cursor:pointer;
+    min-width:0; width:auto !important; visibility:visible !important; opacity:1 !important; }
+  #instaread-demo-player-wrap .irp-wave span { flex:1 1 auto !important; min-width:1px !important;
+    width:auto !important; max-width:none !important; display:block !important;
+    visibility:visible !important; opacity:1 !important; position:static !important;
+    background:#4a4c55 !important; border-radius:1px !important;
+    transition:background .15s linear; }
+  #instaread-demo-player-wrap .irp-wave span.played { background:#e6e6ea !important; }
+  #instaread-demo-player-wrap .irp-ad { flex:0 1 190px; min-width:110px;
+    display:block !important; visibility:visible !important; opacity:1 !important; }
+  #instaread-demo-player-wrap .irp-ad svg.irp-ad-svg { display:block !important;
+    width:100%; max-width:190px; height:auto; border-radius:4px; }
+  #instaread-demo-player-wrap .irp-bottom { display:flex; justify-content:flex-end;
+    align-items:center; gap:6px; margin-top:8px; }
+  #instaread-demo-player-wrap .irp-time { font-size:11.5px; color:#8d8f98;
+    margin-right:auto; font-variant-numeric:tabular-nums; }
+  #instaread-demo-player-wrap .irp-brand { display:flex; align-items:center; gap:4px;
+    font-size:10.5px; font-weight:600; color:#c5c7cf; }
+  #instaread-demo-player-wrap .irp-brand svg { width:8px; height:13px; }
+</style>
+<div class="instaread-player">
+  <div class="irp-top">
+    <div class="irp-label">Listen to audio version of this article</div>
+    <div class="irp-sponsor-tag">Sponsored by</div>
+  </div>
+  <div class="irp-mid">
+    <button class="irp-btn" id="irp-btn" aria-label="Play">
+      <svg id="irp-icon-play" viewBox="0 0 24 24" style="margin-left:2px"><path d="M8 5v14l11-7z"></path></svg>
+      <svg id="irp-icon-pause" viewBox="0 0 24 24" data-irp-hidden=""><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>
+    </button>
+    <div class="irp-wave" id="irp-wave"><span style="height:53% !important"></span><span style="height:42% !important"></span><span style="height:70% !important"></span><span style="height:85% !important"></span><span style="height:100% !important"></span><span style="height:74% !important"></span><span style="height:96% !important"></span><span style="height:100% !important"></span><span style="height:79% !important"></span><span style="height:85% !important"></span><span style="height:66% !important"></span><span style="height:51% !important"></span><span style="height:79% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:100% !important"></span><span style="height:76% !important"></span><span style="height:50% !important"></span><span style="height:52% !important"></span><span style="height:41% !important"></span><span style="height:32% !important"></span><span style="height:31% !important"></span><span style="height:14% !important"></span><span style="height:14% !important"></span><span style="height:15% !important"></span><span style="height:15% !important"></span><span style="height:40% !important"></span><span style="height:17% !important"></span><span style="height:33% !important"></span><span style="height:15% !important"></span><span style="height:26% !important"></span><span style="height:25% !important"></span><span style="height:45% !important"></span><span style="height:48% !important"></span><span style="height:70% !important"></span><span style="height:44% !important"></span><span style="height:29% !important"></span><span style="height:14% !important"></span><span style="height:14% !important"></span><span style="height:39% !important"></span><span style="height:51% !important"></span><span style="height:68% !important"></span><span style="height:54% !important"></span><span style="height:50% !important"></span><span style="height:57% !important"></span><span style="height:84% !important"></span><span style="height:87% !important"></span><span style="height:86% !important"></span><span style="height:79% !important"></span><span style="height:64% !important"></span><span style="height:74% !important"></span><span style="height:55% !important"></span><span style="height:59% !important"></span><span style="height:48% !important"></span><span style="height:56% !important"></span><span style="height:52% !important"></span><span style="height:57% !important"></span><span style="height:41% !important"></span><span style="height:24% !important"></span><span style="height:26% !important"></span><span style="height:19% !important"></span><span style="height:14% !important"></span><span style="height:14% !important"></span><span style="height:34% !important"></span><span style="height:56% !important"></span><span style="height:50% !important"></span><span style="height:71% !important"></span><span style="height:54% !important"></span><span style="height:52% !important"></span><span style="height:53% !important"></span><span style="height:34% !important"></span><span style="height:35% !important"></span><span style="height:25% !important"></span><span style="height:14% !important"></span><span style="height:14% !important"></span><span style="height:14% !important"></span><span style="height:14% !important"></span><span style="height:14% !important"></span><span style="height:18% !important"></span><span style="height:43% !important"></span><span style="height:17% !important"></span></div>
+    <div class="irp-ad"><svg xmlns="http://www.w3.org/2000/svg" class="irp-ad-svg" width="190" height="52" viewBox="0 0 380 104">
+<defs><linearGradient id="irp-ad-grad" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#15161d"></stop><stop offset="1" stop-color="#2a6f2a"></stop>
+</linearGradient></defs>
+<rect width="380" height="104" rx="8" fill="url(#irp-ad-grad)"></rect>
+<text x="24" y="47" font-family="Arial, sans-serif" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="1">NOVA+</text>
+<text x="24" y="76" font-family="Arial, sans-serif" font-size="16" fill="#cfd3e0">
+New season · Stream now</text>
+<circle cx="330" cy="52" r="26" fill="#ffffff" opacity="0.92"></circle>
+<path d="M322 38 L346 52 L322 66 Z" fill="#15161d"></path>
+<rect x="6" y="6" width="30" height="16" rx="3" fill="#000" opacity="0.35"></rect>
+<text x="21" y="18" font-family="Arial, sans-serif" font-size="10" fill="#fff" text-anchor="middle">AD</text>
+</svg></div>
+  </div>
+  <div class="irp-bottom">
+    <div class="irp-time"><span id="irp-cur">0:00</span> / 7:29</div>
+    <div class="irp-brand">
+      <svg viewBox="0 0 15 26" fill="none">
+        <path fill="#d6d8de" d="M0.5 0 H14.5 V16.8 A4.2 4.2 0 0 1 10.3 21 H4.7 A4.2 4.2 0 0 1 0.5 16.8 Z"></path>
+        <rect x="1.7" y="1.9" width="11.6" height="1.5" fill="#1e1f24"></rect>
+        <rect x="1.7" y="4.5" width="11.6" height="1.5" fill="#1e1f24"></rect>
+        <circle cx="7.5" cy="9.9" r="2.3" fill="#1e1f24"></circle>
+        <rect x="5.7" y="13.2" width="3.6" height="7.8" fill="#1e1f24"></rect>
+        <path fill="#d6d8de" d="M4.9 21 H10.1 V26 L7.5 24.2 L4.9 26 Z"></path>
+      </svg>
+      Instaread
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var DURATION = 449;
+  var btn = document.getElementById('irp-btn');
+  var iconPlay = document.getElementById('irp-icon-play');
+  var iconPause = document.getElementById('irp-icon-pause');
+  var wave = document.getElementById('irp-wave');
+  var cur = document.getElementById('irp-cur');
+  var bars = wave.getElementsByTagName('span');
+  var playing = false, elapsed = 0, timer = null, last = 0;
+
+  function fmt(s) {
+    s = Math.max(0, Math.round(s));
+    return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+  }
+  function render() {
+    var frac = Math.min(1, elapsed / DURATION);
+    var n = Math.round(frac * bars.length);
+    for (var i = 0; i < bars.length; i++) {
+      bars[i].className = i < n ? 'played' : '';
+    }
+    cur.textContent = fmt(elapsed);
+  }
+  function tick() {
+    if (!playing) return;
+    var now = performance.now();
+    elapsed += (now - last) / 1000;
+    last = now;
+    if (elapsed >= DURATION) { elapsed = DURATION; stop(); }
+    render();
+  }
+  function start() {
+    if (elapsed >= DURATION) elapsed = 0;
+    playing = true;
+    iconPlay.setAttribute('data-irp-hidden', '');
+    iconPause.removeAttribute('data-irp-hidden');
+    btn.setAttribute('aria-label', 'Pause');
+    last = performance.now();
+    timer = setInterval(tick, 100);
+  }
+  function stop() {
+    playing = false;
+    if (timer) { clearInterval(timer); timer = null; }
+    iconPause.setAttribute('data-irp-hidden', '');
+    iconPlay.removeAttribute('data-irp-hidden');
+    btn.setAttribute('aria-label', 'Play');
+  }
+  btn.addEventListener('click', function (e) {
+    e.preventDefault(); e.stopPropagation();
+    playing ? stop() : start();
+  });
+  wave.addEventListener('click', function (e) {
+    e.preventDefault(); e.stopPropagation();
+    var r = wave.getBoundingClientRect();
+    elapsed = DURATION * Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    render();
+    if (!playing) start();
+  });
+  render();
+})();
+</script>
+</div><p>This is the first Polymarket strategy I have had real success with while letting the system run autonomously in the background. The important shift is simple: instead of trying to be a taker who predicts direction and pays fees/slippage, the strategy sits on the maker side and only takes fills when the price is far enough below my own fair value model.</p>
+
+<p><strong>Watch the video:</strong></p>
+
+
+<p>Nothing here is financial advice. This is a live experiment around <a href="/agentic-ai-trading/">agentic AI trading</a>, and the strategy only makes sense if your fair value model is good enough. Without that, the rest of the system is just a nice-looking way to lose money slowly.</p>
+
+<h2 id="the-problem-with-being-a-taker">The problem with being a taker</h2>
+<p>Most people think about Polymarket as a taker venue: you see a price, you click buy, and you take whatever is available in the order book. That is fine for normal betting, but it is not great if you are trying to extract a small repeatable edge from the 5-minute Bitcoin up/down markets.</p>
+
+<p>Two things eat the edge immediately:</p>
+
+<ul>
+  <li><strong>Fees</strong> - if every trade pays the taker cost, your edge needs to be larger before you even start.</li>
+  <li><strong>Slippage</strong> - if you wanted 40 cents but get filled at 42 cents because the book moved or the queue was ahead of you, a small positive trade can become negative before it resolves.</li>
+</ul>
+
+<p>That is why this setup does not try to chase the current market price. It tries to post resting orders at prices I actually want. If nobody hits them, fine. No trade is better than a bad trade.</p>
+
+<h2 id="the-core-idea-fair-value-minus-a-discount">The core idea: fair value minus a discount</h2>
+<p>The whole strategy depends on calculating a fair value price for the current 5-minute BTC market. If my model thinks the true probability of "up" is 51%, then 0.51 is my fair value. I am not saying Polymarket is always wrong; I am saying my bot only wants to trade when somebody is willing to sell to me at a meaningful discount to that fair value.</p>
+
+<p>In the version I have been testing, the model settled on a 4-cent discount requirement. So if fair value for "up" is 0.51, the bot is only willing to bid around 0.47 for an up share. If the fair value moves down to 0.45, the bid moves down to 0.41. The resting order follows the model, not the crowd.</p>
+
+<p>The down side is just the inverse. If up fair value is 0.51, then down fair value is roughly 0.49. With the same 4-cent discount, the bot only wants to buy down around 0.45 or lower.</p>
+
+<p>The trade only happens when an impatient trader crosses the spread and sells into that resting order. That is the entire edge: do not predict every window, do not force trades, just sit on the book with a price that already has positive expected value baked in.</p>
+
+<h2 id="why-ai-helps-here">Why AI helps here</h2>
+<p>The math is not magic. The hard part is getting the fair value close enough that the discount actually means something. That is where I have been using models like Codex, Claude Code, and Fable-style reasoning to collect data, grade snapshots, inspect model behavior, and keep improving the calibration.</p>
+
+<p>For the 5-minute up/down fair value model, I collected roughly:</p>
+
+<ul>
+  <li>144,000 graded fair value snapshots</li>
+  <li>2,000 resolved markets</li>
+  <li>170 hours of live market data</li>
+</ul>
+
+<p>That is the real work. Anyone can write a loop that posts a bid. The valuable part is building enough historical and live market context that the bid is anchored to something better than a guess. This is why the strategy fits the <a href="/agentic-ai-trading-data-pipeline/">agentic trading data pipeline</a> approach so well: collect, grade, analyze, adjust, and then let the pod run.</p>
+
+<h2 id="the-current-results">The current results</h2>
+<p>The strategy has been running fully autonomously and is up almost $70 in the current test period. The raw count at the time of recording was 32 wins, though that includes some early model data before the parameters were tightened.</p>
+
+<p>After looking at the data, I adjusted the gap so the bot should trade less often but, hopefully, with a steadier return profile. That is the tradeoff I want: fewer fills, better fills. I do not care if this only makes $25 a week if it costs almost nothing to run and behaves well over months.</p>
+
+<p>This is one pod inside the larger <a href="/agentic-ai-trading-pods/">agentic AI trading pods</a> idea. I do not want one giant strategy that needs constant babysitting. I want many small, independent strategies that can run quietly, produce data, and survive my own urge to over-tinker.</p>
+
+<h2 id="maker-side-trading-is-not-the-rebate-game">Maker-side trading is not the rebate game</h2>
+<p>Polymarket has market maker rewards and rebates, but that is not what this particular strategy is built around. I am not trying to optimize for reward-pool participation. I am using maker mechanics for two practical reasons: avoid taker fees where possible and avoid slippage from chasing the book.</p>
+
+<p>That distinction matters. A pure market-making strategy needs to think about two-sided quoting, inventory, rewards, and staying competitive in the book. This strategy is narrower. It only wants to buy discounted shares when the fair value model says the discount is large enough.</p>
+
+<h2 id="the-biggest-risk-overfitting-the-fair-value-model">The biggest risk: overfitting the fair value model</h2>
+<p>The danger is obvious: you can overfit the parameters to the exact week of data you just collected. I have already seen early versions where changing a parameter made the backtest look better but did not necessarily make the live behavior better.</p>
+
+<p>That is why I am trying to make small changes, then keep monitoring. The latest change was a 3-cent gap adjustment after reviewing about seven days of data. I also asked whether we should run Monte Carlo simulations now, but the answer was: later. First we need more live data. Monte Carlo can help answer questions like:</p>
+
+<ul>
+  <li>Is $12 per quote too much?</li>
+  <li>What drawdown should I expect?</li>
+  <li>How likely is the strategy to be down after 100 fills?</li>
+</ul>
+
+<p>Those are useful questions, but if the sample is too small, the simulation just makes fake confidence. More live data comes first.</p>
+
+<h2 id="why-this-is-a-good-agentic-strategy">Why this is a good agentic strategy</h2>
+<p>I like this strategy because it does not require the model to predict Bitcoin perfectly. It asks the model to do something more realistic: estimate fair value, compare it to available prices, and only place a resting order when the spread is large enough.</p>
+
+<p>That is a much better fit for an autonomous AI trading loop. The agent can monitor the market, update fair value, move orders, log every skipped trade, and periodically summarize whether the calibration is still holding. The system is not trying to be a genius. It is trying to be patient.</p>
+<p>The thing to watch is <a href="https://www.siktintelligence.com/blog/forecast-calibration" rel="noopener">calibration</a>: if the fair value model says 51%, those fills need to come true about 51% of the time. If the model drifts overconfident, the discount it thinks it is buying is not real.</p>
+
+<p>This also connects back to the earlier <a href="/polymarket-ai-trading-bot/">Polymarket AI trading bot</a> work, but with a more mature lesson: the first version proved the plumbing. This version is about improving the edge.</p>
+
+<h2 id="resources">Resources</h2>
+<ul>
+  <li><a href="https://polymarket.com/?r=allaboutai" rel="nofollow">Polymarket</a> - the prediction market platform used in this strategy.</li>
+  <li><a href="https://discord.gg/NP3NREWgUS" rel="nofollow">AI_automata Discord</a> - where I am discussing these agentic trading experiments.</li>
+  <li><a href="https://www.allabtai.com/agentic-ai-trading/" rel="nofollow">Agentic AI Trading guide</a> - the main hub for the ongoing trading-agent work.</li>
+</ul>
+
+</article>
+<aside class="pillar-link">Part of the <a href="/agentic-ai-trading/"><strong>Agentic AI Trading guide</strong></a> — the complete reference for everything in this topic.</aside>
+<aside class="related-posts">
+<h2>Related Articles</h2>
+<ul>
+<li><a href="/polymarket-ai-trading-bot/">Building a Polymarket AI Trading Bot From Scratch</a></li><li><a href="/agentic-ai-trading-beginners/">Agentic AI Trading For Beginners: A New Money-Making Era</a></li><li><a href="/codex-vs-claude-polymarket-trading-challenge/">Codex 5.5 vs Claude Opus 4.7: Polymarket Trading Challenge</a></li><li><a href="/polymarket-100x-strategies-ai/">Find 100x Low Risk High Reward Polymarket Strategies With AI</a></li>
+</ul>
+</aside>
+<aside class="author-box" itemscope="" itemtype="https://schema.org/Person">
+<img src="https://www.allabtai.com/avatar.jpg" alt="Kristian Fagerlie" class="author-avatar" width="80" height="80" loading="eager">
+<div class="author-info">
+<p class="author-name"><strong>About Kristian Fagerlie</strong></p>
+<p class="author-bio">Kristian Fagerlie is the creator of the All About AI YouTube channel (200K+ subscribers, 8.9M-view viral hits). He builds and ships autonomous AI agents, browser automation tools (Surfagent), and Claude Code workflows. He is the founder and CEO of Sikt Intelligence, an AI forecasting startup.</p>
+<p class="author-links"><a href="https://www.youtube.com/@AllAboutAI" rel="me noopener" target="_blank">YouTube</a> · <a href="https://www.linkedin.com/in/kristian-fagerlie/" rel="me noopener" target="_blank">LinkedIn</a> · <a href="https://github.com/AllAboutAI-YT" rel="me noopener" target="_blank">GitHub</a> · <a href="https://www.siktintelligence.com/" rel="noopener">Sikt Intelligence</a></p>
+</div>
+</aside>
+</main>
+<div id="palette" role="dialog" aria-modal="true" aria-label="Search articles">
+<div class="palette-box">
+<div class="palette-head">
+<span class="prompt" aria-hidden="true">$</span>
+<input id="palette-input" type="text" placeholder="search articles…" autocomplete="off" spellcheck="false">
+<kbd>esc</kbd>
+</div>
+<ul id="palette-results"></ul>
+</div>
+</div>
+<footer class="site">
+<div class="footer-inner">
+<div class="footer-grid">
+<div>
+<p class="footer-brand"><span class="prompt">$</span>all_about_ai</p>
+<p class="footer-about">AI engineering, Agentic AI Trading and AI Agents. Hands-on builds and experiments from the All About AI YouTube channel — 200K+ subscribers.</p>
+</div>
+<div>
+<h3>TOPIC HUBS</h3>
+<ul>
+<li><a href="/agentic-ai-trading/">Agentic AI Trading</a></li>
+<li><a href="/claude-code/">Claude Code</a></li>
+<li><a href="/ai-agents/">Autonomous AI Agents</a></li>
+<li><a href="/ai-browser-automation/">AI Browser Automation</a></li>
+<li><a href="/ai-agent-passive-income/">AI Agent Passive Income</a></li>
+</ul>
+</div>
+<div>
+<h3>SITE</h3>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/about/">About</a></li>
+<li><a href="/feed.xml">RSS feed</a></li>
+<li><a href="/llms.txt">llms.txt</a></li>
+<li><a href="/sitemap.xml">Sitemap</a></li>
+</ul>
+</div>
+<div>
+<h3>CONNECT</h3>
+<ul>
+<li><a href="https://www.youtube.com/@AllAboutAI" target="_blank" rel="noopener">YouTube ↗</a></li>
+<li><a href="https://github.com/AllAboutAI-YT" target="_blank" rel="noopener">GitHub ↗</a></li>
+<li><a href="https://www.linkedin.com/in/kristian-fagerlie/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+<li><a href="https://www.siktintelligence.com/" rel="noopener">Sikt Intelligence ↗</a></li>
+</ul>
+</div>
+</div>
+<div class="footer-bottom">
+<span>© 2026 All About AI · Kristian Fagerlie</span>
+<span><span class="status-ok">●</span> built by a human + AI · no trackers, no cookies</span>
+</div>
+</div>
+</footer>
+
+
+<button id="to-top" type="button" aria-label="Back to top" class="">[ ^ top ]</button><style>
+  .ir-demo-disclaimer { position:fixed; bottom:0; left:0; right:0; z-index:2147483647;
+    background:#ffd60a; border-top:3px solid #b8960c; color:#1a1400;
+    font:800 13.5px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    text-align:center; padding:11px 18px; letter-spacing:.015em;
+    box-shadow:0 -2px 12px rgba(0,0,0,.18); }
+  .ir-demo-ribbon { position:fixed; top:50%; right:0; z-index:2147483647;
+    transform:translateY(-50%) rotate(180deg); writing-mode:vertical-rl;
+    background:#ffd60a; border:3px solid #b8960c; border-right:none; color:#1a1400;
+    font:800 12.5px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    letter-spacing:.06em; padding:16px 9px; border-radius:0 8px 8px 0;
+    box-shadow:2px 0 12px rgba(0,0,0,.18); white-space:nowrap; }
+</style>
+<div class="ir-demo-disclaimer">⚠ DEMO ONLY — This page is a design mock-up created
+solely for demo purposes. Not affiliated with, endorsed by, or connected to any real
+service, publication, or person.</div>
+<div class="ir-demo-ribbon">⚠ DEMO — NOT A REAL PUBLICATION</div>
+<script>
+document.addEventListener('click', function (e) {
+  var a = e.target.closest ? e.target.closest('a') : null;
+  if (a && !a.closest('#instaread-demo-player-wrap')) e.preventDefault();
+}, true);
+</script></body><style data-ir-clean="1">
+#onetrust-consent-sdk, #onetrust-banner-sdk, .onetrust-pc-dark-filter,
+.qc-cmp2-container, #qc-cmp2-container, [id^="sp_message_container"],
+.fc-consent-root, #usercentrics-root, #didomi-host, #cmpbox, #cmpbox2,
+#CybotCookiebotDialog, .truste_overlay, .truste_box_overlay, #cookie-notice,
+.cky-consent-container, #cookiescript_injected, .osano-cm-window,
+.pum, .pum-overlay, [class*="popmake"], .mfp-bg, .mfp-wrap, .modal-backdrop,
+.fancybox-overlay, [id^="om-"], .sgpb-popup-overlay, .elementor-popup-modal,
+.tve_p_lb_overlay, .mc-modal, .mc-modal-bg
+{ display: none !important; }
+</style></html>
